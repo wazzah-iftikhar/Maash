@@ -4,6 +4,7 @@ import FormSuccess from '@/components/FormSuccess'
 
 const WA_NUMBER = '+92 333 4794867'
 const WA_LINK   = `https://wa.me/923334794867`
+const EMAIL     = 'wazzah.iftikhar@gmail.com'
 
 const MODULES = [
   {
@@ -68,18 +69,27 @@ function ModuleCard({
   )
 }
 
-// ── WhatsApp strip ────────────────────────────────────────
+// ── Contact strips ────────────────────────────────────────
 function WaStrip() {
   return (
-    <a
-      href={WA_LINK}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-md px-4 py-3 text-sm text-green-900 font-medium mb-5 hover:bg-green-100 transition-colors"
-    >
-      <span className="text-xl">💬</span>
-      Prefer WhatsApp? Reach us directly:&nbsp;<strong>{WA_NUMBER}</strong>
-    </a>
+    <div className="space-y-2 mb-5">
+      <a
+        href={WA_LINK}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-md px-4 py-3 text-sm text-green-900 font-medium hover:bg-green-100 transition-colors"
+      >
+        <span className="text-xl">💬</span>
+        Prefer WhatsApp? Reach us directly:&nbsp;<strong>{WA_NUMBER}</strong>
+      </a>
+      <a
+        href={`mailto:${EMAIL}`}
+        className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-md px-4 py-3 text-sm text-blue-900 font-medium hover:bg-blue-100 transition-colors"
+      >
+        <span className="text-xl">✉️</span>
+        Email us at:&nbsp;<strong>{EMAIL}</strong>
+      </a>
+    </div>
   )
 }
 
