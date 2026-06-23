@@ -10,7 +10,10 @@
       "Bash(mkdir -p /Users/muhammadwazzahiftikhar/Web/maaash/.claude)",
       "mcp__Claude_Preview__preview_start",
       "mcp__Claude_in_Chrome__navigate",
-      "Bash(gh auth *)"
+      "Bash(gh auth *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }
