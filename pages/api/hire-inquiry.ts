@@ -1,10 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { sendMail, tableHtml } from '@/lib/mailer'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
 
   const { company, country, city, workMode, salary, schedule, jd, name, email } = req.body
+
+  await supabaseAdmin.from('hire_inquiries').insert({
+    company, country, city, work_mode: workMode, salary, schedule, jd, name, email,
+  })
 
   const html = `
     <h2 style="font-family:Georgia,serif;color:#1A1A2E">New Hiring Inquiry — Ma'aash</h2>
@@ -15,9 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     await sendMail(`[Ma'aash] Hiring Inquiry – ${company}`, html)
-    res.status(200).json({ ok: true })
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ ok: false })
-  }
+  } catch (_) {}
+
+  res.status(200).json({ ok: true })
 }

@@ -1,30 +1,70 @@
 import Head from 'next/head'
 import { useState } from 'react'
-import { JOBS, COUNTRIES, CITIES, FIELDS, COMP_RANGES, Job } from '@/data/jobs'
+import { GetServerSideProps } from 'next'
+import { Job } from '@/data/jobs'
+import { JOBS as STATIC_JOBS } from '@/data/jobs'
+import { supabase } from '@/lib/supabase'
 import JobCard from '@/components/JobCard'
 import JobModal from '@/components/JobModal'
 import CVModal from '@/components/CVModal'
 
 const ALL = ''
 
-export default function JobsPage() {
-  const [country,  setCountry]  = useState(ALL)
-  const [city,     setCity]     = useState(ALL)
-  const [field,    setField]    = useState(ALL)
-  const [comp,     setComp]     = useState(ALL)
-  const [type,     setType]     = useState(ALL)
-  const [mode,     setMode]     = useState(ALL)
+interface Props { jobs: Job[] }
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  const { data, error } = await supabase
+    .from('jobs')
+    .select('*')
+    .eq('active', true)
+    .order('posted_date', { ascending: false })
+
+  if (error || !data || data.length === 0) {
+    return { props: { jobs: STATIC_JOBS } }
+  }
+
+  const jobs: Job[] = data.map((r: any) => ({
+    id:           r.id,
+    title:        r.title,
+    company:      r.company,
+    country:      r.country,
+    city:         r.city,
+    field:        r.field,
+    type:         r.type,
+    mode:         r.mode,
+    comp:         r.comp,
+    compRange:    r.comp_range,
+    desc:         r.description,
+    requirements: r.requirements ?? [],
+    postedDate:   r.posted_date,
+  }))
+
+  return { props: { jobs } }
+}
+
+export default function JobsPage({ jobs }: Props) {
+  const [country, setCountry] = useState(ALL)
+  const [city,    setCity]    = useState(ALL)
+  const [field,   setField]   = useState(ALL)
+  const [comp,    setComp]    = useState(ALL)
+  const [type,    setType]    = useState(ALL)
+  const [mode,    setMode]    = useState(ALL)
 
   const [selected, setSelected] = useState<Job | null>(null)
   const [cvOpen,   setCvOpen]   = useState(false)
 
-  const filtered = JOBS.filter(j =>
-    (!country || j.country === country) &&
-    (!city    || j.city    === city)    &&
-    (!field   || j.field   === field)   &&
-    (!comp    || j.compRange === comp)  &&
-    (!type    || j.type    === type)    &&
-    (!mode    || j.mode    === mode)
+  const countries  = [...new Set(jobs.map(j => j.country))].sort()
+  const cities     = [...new Set(jobs.map(j => j.city))].sort()
+  const fields     = [...new Set(jobs.map(j => j.field))].sort()
+  const compRanges = [...new Set(jobs.map(j => j.compRange))].sort()
+
+  const filtered = jobs.filter(j =>
+    (!country || j.country   === country) &&
+    (!city    || j.city      === city)    &&
+    (!field   || j.field     === field)   &&
+    (!comp    || j.compRange === comp)    &&
+    (!type    || j.type      === type)    &&
+    (!mode    || j.mode      === mode)
   )
 
   const reset = () => {
@@ -35,7 +75,7 @@ export default function JobsPage() {
   return (
     <>
       <Head>
-        <title>Open Roles | Ma'aash</title>
+        <title>Open Roles | Ma&apos;aash</title>
         <meta name="description" content="Browse open roles across all industries and levels. Find opportunities that align with your expertise." />
       </Head>
 
@@ -59,10 +99,10 @@ export default function JobsPage() {
             </h3>
 
             {[
-              { label: 'Country',      value: country, set: setCountry, opts: COUNTRIES },
-              { label: 'City',         value: city,    set: setCity,    opts: CITIES },
-              { label: 'Field / Industry', value: field, set: setField,  opts: FIELDS },
-              { label: 'Compensation', value: comp,    set: setComp,    opts: COMP_RANGES },
+              { label: 'Country',          value: country, set: setCountry, opts: countries  },
+              { label: 'City',             value: city,    set: setCity,    opts: cities      },
+              { label: 'Field / Industry', value: field,   set: setField,   opts: fields      },
+              { label: 'Compensation',     value: comp,    set: setComp,    opts: compRanges  },
             ].map(({ label, value, set, opts }) => (
               <div key={label} className="mb-4">
                 <label className="block text-[0.65rem] font-semibold uppercase tracking-widest text-muted mb-1.5">

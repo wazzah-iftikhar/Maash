@@ -1,10 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { sendMail, tableHtml } from '@/lib/mailer'
+import { supabaseAdmin } from '@/lib/supabase'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
 
   const { name, occupation, email, phone, sections, message } = req.body
+
+  await supabaseAdmin.from('assessment_individual').insert({
+    name, occupation, email, phone, sections, message,
+  })
 
   const html = `
     <h2 style="font-family:Georgia,serif;color:#1A1A2E">Individual Assessment Request — Ma'aash</h2>
@@ -15,9 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     await sendMail(`[Ma'aash] Assessment Request – ${name}`, html)
-    res.status(200).json({ ok: true })
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ ok: false })
-  }
+  } catch (_) {}
+
+  res.status(200).json({ ok: true })
 }
