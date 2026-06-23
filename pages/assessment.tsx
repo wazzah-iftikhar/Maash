@@ -2,8 +2,8 @@ import Head from 'next/head'
 import { useState } from 'react'
 import FormSuccess from '@/components/FormSuccess'
 
-const WA_NUMBER = '+92-XXX-XXX-XXXX'   // ← replace with real number
-const WA_LINK   = `https://wa.me/92XXXXXXXXXX` // ← replace digits
+const WA_NUMBER = '+92 333 4794867'
+const WA_LINK   = `https://wa.me/923334794867`
 
 const MODULES = [
   {
