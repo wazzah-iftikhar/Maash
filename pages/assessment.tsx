@@ -4,7 +4,7 @@ import FormSuccess from '@/components/FormSuccess'
 
 const WA_NUMBER = '+92 333 4794867'
 const WA_LINK   = `https://wa.me/923334794867`
-const EMAIL     = 'wazzah.iftikhar@gmail.com'
+const EMAIL     = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'contact@maaash.com'
 
 const MODULES = [
   {

@@ -1,11 +1,19 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { sendMail, tableHtml } from '@/lib/mailer'
 import { supabaseAdmin } from '@/lib/supabase'
+import { validateAssessmentIndividual } from '@/lib/validate'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end()
 
-  const { name, occupation, email, phone, sections, message } = req.body
+  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0] ?? 'unknown'
+  if (!checkRateLimit(ip)) return res.status(429).json({ error: 'Too many requests. Please try again later.' })
+
+  const data = validateAssessmentIndividual(req.body ?? {})
+  if (!data) return res.status(400).json({ error: 'Missing required fields.' })
+
+  const { name, occupation, email, phone, sections, message } = data
 
   await supabaseAdmin.from('assessment_individual').insert({
     name, occupation, email, phone, sections, message,
@@ -18,9 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     <p style="font-family:Inter,sans-serif;font-size:14px;line-height:1.7">${message}</p>
   `
 
-  try {
-    await sendMail(`[Ma'aash] Assessment Request – ${name}`, html)
-  } catch (_) {}
+  try { await sendMail(`[Ma'aash] Assessment Request – ${name}`, html) } catch (_) {}
 
   res.status(200).json({ ok: true })
 }

@@ -4,6 +4,7 @@ import { GetServerSideProps } from 'next'
 import { Job } from '@/data/jobs'
 import { JOBS as STATIC_JOBS } from '@/data/jobs'
 import { supabase } from '@/lib/supabase'
+import { DbJob } from '@/types/database'
 import JobCard from '@/components/JobCard'
 import JobModal from '@/components/JobModal'
 import CVModal from '@/components/CVModal'
@@ -23,7 +24,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
     return { props: { jobs: STATIC_JOBS } }
   }
 
-  const jobs: Job[] = data.map((r: any) => ({
+  const jobs: Job[] = data.map((r: DbJob) => ({
     id:           r.id,
     title:        r.title,
     company:      r.company,
