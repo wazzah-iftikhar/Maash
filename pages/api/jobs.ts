@@ -1,9 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { supabase } from '@/lib/supabase'
 import { JOBS as STATIC_JOBS } from '@/data/jobs'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') return res.status(405).end()
+
+  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0] ?? 'unknown'
+  if (!checkRateLimit(ip, 30, 60_000)) return res.status(429).json({ error: 'Too many requests.' })
 
   const { data, error } = await supabase
     .from('jobs')

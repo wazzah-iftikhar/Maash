@@ -1,3 +1,10 @@
+export function safeBody(body: unknown): Record<string, unknown> {
+  if (body && typeof body === 'object' && !Array.isArray(body)) {
+    return body as Record<string, unknown>
+  }
+  return {}
+}
+
 const MAX = {
   short:  200,
   medium: 1000,

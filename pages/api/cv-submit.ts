@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { sendMail, tableHtml } from '@/lib/mailer'
 import { supabaseAdmin } from '@/lib/supabaseAdmin'
-import { validateCvSubmit } from '@/lib/validate'
+import { validateCvSubmit, safeBody } from '@/lib/validate'
 import { checkRateLimit } from '@/lib/rateLimit'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0] ?? 'unknown'
   if (!checkRateLimit(ip)) return res.status(429).json({ error: 'Too many requests. Please try again later.' })
 
-  const data = validateCvSubmit(req.body ?? {})
+  const data = validateCvSubmit(safeBody(req.body))
   if (!data) return res.status(400).json({ error: 'Missing required fields.' })
 
   const { name, email, phone, role, location, workMode, message } = data
