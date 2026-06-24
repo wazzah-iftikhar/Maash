@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import AdminLayout from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/adminAuth'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { DbJob } from '@/types/database'
 
 const EMPTY = {
@@ -22,7 +22,7 @@ export default function AdminJobs() {
 
   const load = async () => {
     setFetching(true)
-    const { data } = await supabaseAdmin.from('jobs').select('*').order('created_at', { ascending: false })
+    const { data } = await supabase.from('jobs').select('*').order('created_at', { ascending: false })
     setJobs(data ?? [])
     setFetching(false)
   }
@@ -54,9 +54,9 @@ export default function AdminJobs() {
       requirements: form.requirements.split('\n').map(r => r.trim()).filter(Boolean),
     }
     if (editing) {
-      await supabaseAdmin.from('jobs').update(payload).eq('id', editing.id)
+      await supabase.from('jobs').update(payload).eq('id', editing.id)
     } else {
-      await supabaseAdmin.from('jobs').insert({ ...payload, posted_date: new Date().toISOString().split('T')[0] })
+      await supabase.from('jobs').insert({ ...payload, posted_date: new Date().toISOString().split('T')[0] })
     }
     setSaving(false)
     setShowForm(false)
@@ -64,13 +64,13 @@ export default function AdminJobs() {
   }
 
   const toggleActive = async (job: DbJob) => {
-    await supabaseAdmin.from('jobs').update({ active: !job.active }).eq('id', job.id)
+    await supabase.from('jobs').update({ active: !job.active }).eq('id', job.id)
     load()
   }
 
   const deleteJob = async (id: number) => {
     if (!confirm('Delete this job? This cannot be undone.')) return
-    await supabaseAdmin.from('jobs').delete().eq('id', id)
+    await supabase.from('jobs').delete().eq('id', id)
     load()
   }
 

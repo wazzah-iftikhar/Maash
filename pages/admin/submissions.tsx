@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import AdminLayout from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/adminAuth'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 type Tab = 'hire' | 'individual' | 'corporate' | 'cv'
 
@@ -110,7 +110,7 @@ export default function AdminSubmissions() {
     if (loading) return
     const t = TABS.find(t => t.key === tab)!
     setFetching(true)
-    supabaseAdmin.from(t.table).select('*').order('created_at', { ascending: false })
+    supabase.from(t.table).select('*').order('created_at', { ascending: false })
       .then(({ data }) => { setRows(data ?? []); setFetching(false) })
   }, [tab, loading])
 

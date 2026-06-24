@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import AdminLayout from '@/components/AdminLayout'
 import { useAdminAuth } from '@/lib/adminAuth'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 
 interface Counts {
   jobs: number
@@ -29,11 +29,11 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (loading) return
     Promise.all([
-      supabaseAdmin.from('jobs').select('*', { count: 'exact', head: true }),
-      supabaseAdmin.from('hire_inquiries').select('*', { count: 'exact', head: true }),
-      supabaseAdmin.from('assessment_individual').select('*', { count: 'exact', head: true }),
-      supabaseAdmin.from('assessment_corporate').select('*', { count: 'exact', head: true }),
-      supabaseAdmin.from('cv_submissions').select('*', { count: 'exact', head: true }),
+      supabase.from('jobs').select('*', { count: 'exact', head: true }),
+      supabase.from('hire_inquiries').select('*', { count: 'exact', head: true }),
+      supabase.from('assessment_individual').select('*', { count: 'exact', head: true }),
+      supabase.from('assessment_corporate').select('*', { count: 'exact', head: true }),
+      supabase.from('cv_submissions').select('*', { count: 'exact', head: true }),
     ]).then(([jobs, hire, indiv, corp, cv]) => {
       setCounts({
         jobs:                  jobs.count  ?? 0,
