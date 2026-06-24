@@ -15,9 +15,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { org, contact, email, phone, partnerType, teamSize, message } = data
 
-  await supabaseAdmin.from('assessment_corporate').insert({
+  const { error: dbErr } = await supabaseAdmin.from('assessment_corporate').insert({
     org, contact, email, phone, partner_type: partnerType, team_size: teamSize, message,
   })
+  if (dbErr) return res.status(500).json({ error: 'Failed to save your request. Please try again.' })
 
   const html = `
     <h2 style="font-family:Georgia,serif;color:#1A1A2E">Corporate Partnership Inquiry — Ma'aash</h2>

@@ -15,9 +15,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { name, occupation, email, phone, sections, message } = data
 
-  await supabaseAdmin.from('assessment_individual').insert({
+  const { error: dbErr } = await supabaseAdmin.from('assessment_individual').insert({
     name, occupation, email, phone, sections, message,
   })
+  if (dbErr) return res.status(500).json({ error: 'Failed to save your request. Please try again.' })
 
   const html = `
     <h2 style="font-family:Georgia,serif;color:#1A1A2E">Individual Assessment Request — Ma'aash</h2>

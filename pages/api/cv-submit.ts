@@ -15,9 +15,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { name, email, phone, role, location, workMode, message } = data
 
-  await supabaseAdmin.from('cv_submissions').insert({
+  const { error: dbErr } = await supabaseAdmin.from('cv_submissions').insert({
     name, email, phone, role, location, work_mode: workMode, message,
   })
+  if (dbErr) return res.status(500).json({ error: 'Failed to save your submission. Please try again.' })
 
   const html = `
     <h2 style="font-family:Georgia,serif;color:#1A1A2E">New CV Submission — Ma'aash Talent Pool</h2>

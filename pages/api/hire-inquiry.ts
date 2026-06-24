@@ -15,9 +15,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const { company, country, city, workMode, salary, schedule, jd, name, email } = data
 
-  await supabaseAdmin.from('hire_inquiries').insert({
+  const { error: dbErr } = await supabaseAdmin.from('hire_inquiries').insert({
     company, country, city, work_mode: workMode, salary, schedule, jd, name, email,
   })
+  if (dbErr) return res.status(500).json({ error: 'Failed to save your inquiry. Please try again.' })
 
   const html = `
     <h2 style="font-family:Georgia,serif;color:#1A1A2E">New Hiring Inquiry — Ma'aash</h2>

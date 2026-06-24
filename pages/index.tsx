@@ -76,18 +76,30 @@ function StatCard({ num, label }: { num: string; label: string }) {
 function HiringForm() {
   const [submitted, setSubmitted] = useState(false)
   const [loading,   setLoading]   = useState(false)
+  const [error,     setError]     = useState('')
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setLoading(true)
+    setError('')
     const data = Object.fromEntries(new FormData(e.currentTarget))
     try {
-      await fetch('/api/hire-inquiry', {
+      const res = await fetch('/api/hire-inquiry', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
-    } catch (_) {}
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        setError(body.error || 'Something went wrong. Please try again.')
+        setLoading(false)
+        return
+      }
+    } catch (_) {
+      setError('Network error. Please check your connection and try again.')
+      setLoading(false)
+      return
+    }
     setLoading(false)
     setSubmitted(true)
   }
@@ -152,6 +164,7 @@ function HiringForm() {
               <input name="email" type="email" required className="form-input" placeholder="work@company.com" />
             </div>
           </div>
+          {error && <p className="text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-3">{error}</p>}
           <button type="submit" disabled={loading} className="btn-primary w-full justify-center">
             {loading ? 'Submitting...' : 'Submit Hiring Request'}
           </button>
