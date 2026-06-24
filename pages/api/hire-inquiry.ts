@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { sendMail, tableHtml } from '@/lib/mailer'
-import { supabaseAdmin } from '@/lib/supabase'
+import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { validateHireInquiry } from '@/lib/validate'
 import { checkRateLimit } from '@/lib/rateLimit'
 
