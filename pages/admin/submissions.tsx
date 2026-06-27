@@ -79,10 +79,35 @@ function CorporateTable({ rows }: { rows: any[] }) {
   )
 }
 
+function CvDownloadButton({ cvPath }: { cvPath: string }) {
+  const [loading, setLoading] = useState(false)
+
+  const handleDownload = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch(`/api/cv-signed-url?path=${encodeURIComponent(cvPath)}`)
+      const { url } = await res.json()
+      if (url) window.open(url, '_blank', 'noopener,noreferrer')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <button
+      onClick={handleDownload}
+      disabled={loading}
+      className="text-xs px-2 py-1 rounded border border-gold text-gold hover:bg-gold hover:text-white transition-colors disabled:opacity-50"
+    >
+      {loading ? '…' : 'Download CV'}
+    </button>
+  )
+}
+
 function CvTable({ rows }: { rows: any[] }) {
   return (
     <table className="w-full text-sm">
-      <thead className="bg-gray-50 border-b"><tr>{['Date','Name','Email','Phone','Role / Field','Location','Mode'].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{h}</th>)}</tr></thead>
+      <thead className="bg-gray-50 border-b"><tr>{['Date','Name','Email','Phone','Role / Field','Location','Mode','CV'].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{h}</th>)}</tr></thead>
       <tbody className="divide-y divide-gray-100">
         {rows.map(r => (
           <tr key={r.id} className="hover:bg-gray-50">
@@ -93,6 +118,9 @@ function CvTable({ rows }: { rows: any[] }) {
             <td className="px-4 py-3 text-gray-600">{r.role}</td>
             <td className="px-4 py-3 text-gray-600">{r.location}</td>
             <td className="px-4 py-3 text-gray-600">{r.work_mode}</td>
+            <td className="px-4 py-3">
+              {r.cv_path ? <CvDownloadButton cvPath={r.cv_path} /> : <span className="text-gray-300 text-xs">—</span>}
+            </td>
           </tr>
         ))}
       </tbody>

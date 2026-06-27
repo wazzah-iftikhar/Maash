@@ -2,9 +2,6 @@ import Head from 'next/head'
 import { useState } from 'react'
 import FormSuccess from '@/components/FormSuccess'
 
-const WA_NUMBER = '+92 333 4794867'
-const WA_LINK   = `https://wa.me/923334794867`
-const EMAIL     = process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'contact@maaash.com'
 
 const MODULES = [
   {
@@ -69,29 +66,6 @@ function ModuleCard({
   )
 }
 
-// ── Contact strips ────────────────────────────────────────
-function WaStrip() {
-  return (
-    <div className="space-y-2 mb-5">
-      <a
-        href={WA_LINK}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-md px-4 py-3 text-sm text-green-900 font-medium hover:bg-green-100 transition-colors"
-      >
-        <span className="text-xl">💬</span>
-        Prefer WhatsApp? Reach us directly:&nbsp;<strong>{WA_NUMBER}</strong>
-      </a>
-      <a
-        href={`mailto:${EMAIL}`}
-        className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-md px-4 py-3 text-sm text-blue-900 font-medium hover:bg-blue-100 transition-colors"
-      >
-        <span className="text-xl">✉️</span>
-        Email us at:&nbsp;<strong>{EMAIL}</strong>
-      </a>
-    </div>
-  )
-}
 
 // ── Individual form ───────────────────────────────────────
 function IndividualForm({ selectedModules }: { selectedModules: number[] }) {
@@ -124,7 +98,7 @@ function IndividualForm({ selectedModules }: { selectedModules: number[] }) {
       <p className="text-sm text-muted mb-5 leading-relaxed">
         For professionals seeking self-awareness, career clarity, leadership insight, or personal development.
       </p>
-      <WaStrip />
+      <p className="text-sm text-muted mb-5">Fill in your details below and we'll reach out to you directly.</p>
       {submitted ? (
         <FormSuccess message="Request received. We'll reach out within 48 hours to proceed." />
       ) : (
@@ -194,7 +168,7 @@ function CorporateForm() {
       <p className="text-sm text-muted mb-5 leading-relaxed">
         For organizations seeking team assessments, talent advisory, office visits, or institutional collaboration.
       </p>
-      <WaStrip />
+      <p className="text-sm text-muted mb-5">Fill in your details below and we'll reach out to you directly.</p>
       {submitted ? (
         <FormSuccess message="Inquiry received. Our advisory team will contact you shortly." />
       ) : (

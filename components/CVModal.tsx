@@ -7,9 +7,19 @@ interface CVModalProps {
   onClose: () => void
 }
 
+const ACCEPTED_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+]
+const ACCEPTED_EXT = '.pdf,.doc,.docx'
+const MAX_SIZE_MB = 5
+
 export default function CVModal({ open, onClose }: CVModalProps) {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading]     = useState(false)
+  const [fileError, setFileError] = useState('')
+  const [fileName, setFileName]   = useState('')
 
   useEffect(() => {
     if (!open) return
@@ -24,17 +34,35 @@ export default function CVModal({ open, onClose }: CVModalProps) {
 
   if (!open) return null
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    setFileError('')
+    setFileName('')
+    if (!file) return
+    if (!ACCEPTED_TYPES.includes(file.type)) {
+      setFileError('Please upload a PDF, DOC, or DOCX file.')
+      e.target.value = ''
+      return
+    }
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      setFileError(`File must be under ${MAX_SIZE_MB}MB.`)
+      e.target.value = ''
+      return
+    }
+    setFileName(file.name)
+  }
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (fileError) return
     setLoading(true)
     const form = e.currentTarget
-    const data = Object.fromEntries(new FormData(form))
+    const formData = new FormData(form)
 
     try {
       await fetch('/api/cv-submit', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: formData,
       })
     } catch (_) {}
 
@@ -98,7 +126,29 @@ export default function CVModal({ open, onClose }: CVModalProps) {
               <label className="form-label">Career Goals / Message</label>
               <textarea name="message" className="form-textarea" placeholder="Briefly describe your background and what you're looking for..." />
             </div>
-            <button type="submit" disabled={loading} className="btn-primary w-full justify-center">
+            <div>
+              <label className="form-label">
+                Attach CV <span className="text-muted font-normal">(optional — PDF, DOC, DOCX · max 5MB)</span>
+              </label>
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-navy/20 bg-white text-sm text-navy group-hover:border-gold group-hover:text-gold transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 0L8 8m4-4l4 4" />
+                  </svg>
+                  {fileName ? 'Change file' : 'Choose file'}
+                </span>
+                {fileName && <span className="text-sm text-muted truncate max-w-[180px]">{fileName}</span>}
+                <input
+                  type="file"
+                  name="cv"
+                  accept={ACCEPTED_EXT}
+                  onChange={handleFileChange}
+                  className="sr-only"
+                />
+              </label>
+              {fileError && <p className="text-red-500 text-xs mt-1">{fileError}</p>}
+            </div>
+            <button type="submit" disabled={loading || !!fileError} className="btn-primary w-full justify-center">
               {loading ? 'Submitting...' : 'Submit Profile'}
             </button>
           </form>
