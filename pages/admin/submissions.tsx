@@ -17,10 +17,27 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-function HireTable({ rows }: { rows: any[] }) {
+function DeleteRowButton({ onDelete }: { onDelete: () => void }) {
+  const [confirm, setConfirm] = useState(false)
+  if (confirm) {
+    return (
+      <div className="flex items-center gap-1">
+        <button onClick={onDelete} className="text-xs px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700 transition-colors">Yes</button>
+        <button onClick={() => setConfirm(false)} className="text-xs px-2 py-1 rounded border border-gray-300 text-gray-500 hover:bg-gray-50 transition-colors">No</button>
+      </div>
+    )
+  }
+  return (
+    <button onClick={() => setConfirm(true)} className="text-gray-300 hover:text-red-500 transition-colors" title="Delete">
+      ✕
+    </button>
+  )
+}
+
+function HireTable({ rows, onDelete }: { rows: any[]; onDelete: (id: string) => void }) {
   return (
     <table className="w-full text-sm">
-      <thead className="bg-gray-50 border-b"><tr>{['Date','Name','Email','Company','Location','Mode','Salary'].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{h}</th>)}</tr></thead>
+      <thead className="bg-gray-50 border-b"><tr>{['Date','Name','Email','Company','Location','Mode','Salary',''].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{h}</th>)}</tr></thead>
       <tbody className="divide-y divide-gray-100">
         {rows.map(r => (
           <tr key={r.id} className="hover:bg-gray-50">
@@ -31,6 +48,7 @@ function HireTable({ rows }: { rows: any[] }) {
             <td className="px-4 py-3 text-gray-600">{r.city}, {r.country}</td>
             <td className="px-4 py-3 text-gray-600">{r.work_mode}</td>
             <td className="px-4 py-3 text-gray-600">{r.salary}</td>
+            <td className="px-4 py-3"><DeleteRowButton onDelete={() => onDelete(r.id)} /></td>
           </tr>
         ))}
       </tbody>
@@ -38,10 +56,10 @@ function HireTable({ rows }: { rows: any[] }) {
   )
 }
 
-function IndividualTable({ rows }: { rows: any[] }) {
+function IndividualTable({ rows, onDelete }: { rows: any[]; onDelete: (id: string) => void }) {
   return (
     <table className="w-full text-sm">
-      <thead className="bg-gray-50 border-b"><tr>{['Date','Name','Email','Occupation','Phone','Sections'].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{h}</th>)}</tr></thead>
+      <thead className="bg-gray-50 border-b"><tr>{['Date','Name','Email','Occupation','Phone','Sections',''].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{h}</th>)}</tr></thead>
       <tbody className="divide-y divide-gray-100">
         {rows.map(r => (
           <tr key={r.id} className="hover:bg-gray-50">
@@ -51,6 +69,7 @@ function IndividualTable({ rows }: { rows: any[] }) {
             <td className="px-4 py-3 text-gray-600">{r.occupation}</td>
             <td className="px-4 py-3 text-gray-600">{r.phone}</td>
             <td className="px-4 py-3 text-gray-600 max-w-xs truncate">{r.sections}</td>
+            <td className="px-4 py-3"><DeleteRowButton onDelete={() => onDelete(r.id)} /></td>
           </tr>
         ))}
       </tbody>
@@ -58,10 +77,10 @@ function IndividualTable({ rows }: { rows: any[] }) {
   )
 }
 
-function CorporateTable({ rows }: { rows: any[] }) {
+function CorporateTable({ rows, onDelete }: { rows: any[]; onDelete: (id: string) => void }) {
   return (
     <table className="w-full text-sm">
-      <thead className="bg-gray-50 border-b"><tr>{['Date','Organization','Contact','Email','Phone','Partnership','Team Size'].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{h}</th>)}</tr></thead>
+      <thead className="bg-gray-50 border-b"><tr>{['Date','Organization','Contact','Email','Phone','Partnership','Team Size',''].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{h}</th>)}</tr></thead>
       <tbody className="divide-y divide-gray-100">
         {rows.map(r => (
           <tr key={r.id} className="hover:bg-gray-50">
@@ -72,6 +91,7 @@ function CorporateTable({ rows }: { rows: any[] }) {
             <td className="px-4 py-3 text-gray-600">{r.phone}</td>
             <td className="px-4 py-3 text-gray-600">{r.partner_type}</td>
             <td className="px-4 py-3 text-gray-600">{r.team_size}</td>
+            <td className="px-4 py-3"><DeleteRowButton onDelete={() => onDelete(r.id)} /></td>
           </tr>
         ))}
       </tbody>
@@ -107,10 +127,10 @@ function CvDownloadButton({ cvPath }: { cvPath: string }) {
   )
 }
 
-function CvTable({ rows }: { rows: any[] }) {
+function CvTable({ rows, onDelete }: { rows: any[]; onDelete: (id: string) => void }) {
   return (
     <table className="w-full text-sm">
-      <thead className="bg-gray-50 border-b"><tr>{['Date','Name','Email','Phone','Role / Field','Location','Mode','CV'].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{h}</th>)}</tr></thead>
+      <thead className="bg-gray-50 border-b"><tr>{['Date','Name','Email','Phone','Role / Field','Location','Mode','CV',''].map(h => <th key={h} className="text-left px-4 py-3 text-xs font-semibold uppercase tracking-wider text-gray-500">{h}</th>)}</tr></thead>
       <tbody className="divide-y divide-gray-100">
         {rows.map(r => (
           <tr key={r.id} className="hover:bg-gray-50">
@@ -124,6 +144,7 @@ function CvTable({ rows }: { rows: any[] }) {
             <td className="px-4 py-3">
               {r.cv_path ? <CvDownloadButton cvPath={r.cv_path} /> : <span className="text-gray-300 text-xs">—</span>}
             </td>
+            <td className="px-4 py-3"><DeleteRowButton onDelete={() => onDelete(r.id)} /></td>
           </tr>
         ))}
       </tbody>
@@ -149,6 +170,12 @@ export default function AdminSubmissions() {
     if (loading) return
     fetchRows(TABS.find(t => t.key === tab)!)
   }, [tab, loading])
+
+  const handleDeleteRow = async (id: string) => {
+    const t = TABS.find(t => t.key === tab)!
+    await supabase.from(t.table).delete().eq('id', id)
+    setRows(prev => prev.filter(r => r.id !== id))
+  }
 
   const handleDeleteAll = async () => {
     if (!confirm) { setConfirm(true); return }
@@ -190,10 +217,10 @@ export default function AdminSubmissions() {
             <div className="p-8 text-center text-gray-400 text-sm">No submissions yet.</div>
           ) : (
             <>
-              {tab === 'hire'       && <HireTable       rows={rows} />}
-              {tab === 'individual' && <IndividualTable  rows={rows} />}
-              {tab === 'corporate'  && <CorporateTable   rows={rows} />}
-              {tab === 'cv'         && <CvTable          rows={rows} />}
+              {tab === 'hire'       && <HireTable       rows={rows} onDelete={handleDeleteRow} />}
+              {tab === 'individual' && <IndividualTable  rows={rows} onDelete={handleDeleteRow} />}
+              {tab === 'corporate'  && <CorporateTable   rows={rows} onDelete={handleDeleteRow} />}
+              {tab === 'cv'         && <CvTable          rows={rows} onDelete={handleDeleteRow} />}
             </>
           )}
         </div>
