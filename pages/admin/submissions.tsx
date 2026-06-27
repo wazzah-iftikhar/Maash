@@ -133,19 +133,36 @@ function CvTable({ rows }: { rows: any[] }) {
 
 export default function AdminSubmissions() {
   const { loading, signOut } = useAdminAuth()
-  const [tab,  setTab]  = useState<Tab>('hire')
-  const [rows, setRows] = useState<any[]>([])
+  const [tab,      setTab]      = useState<Tab>('hire')
+  const [rows,     setRows]     = useState<any[]>([])
   const [fetching, setFetching] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [confirm,  setConfirm]  = useState(false)
 
-  useEffect(() => {
-    if (loading) return
-    const t = TABS.find(t => t.key === tab)!
+  const fetchRows = (t: typeof TABS[0]) => {
     setFetching(true)
     supabase.from(t.table).select('*').order('created_at', { ascending: false })
       .then(({ data }) => { setRows(data ?? []); setFetching(false) })
+  }
+
+  useEffect(() => {
+    if (loading) return
+    fetchRows(TABS.find(t => t.key === tab)!)
   }, [tab, loading])
 
+  const handleDeleteAll = async () => {
+    if (!confirm) { setConfirm(true); return }
+    setDeleting(true)
+    setConfirm(false)
+    const t = TABS.find(t => t.key === tab)!
+    await supabase.from(t.table).delete().neq('id', '00000000-0000-0000-0000-000000000000')
+    setRows([])
+    setDeleting(false)
+  }
+
   if (loading) return null
+
+  const currentLabel = TABS.find(t => t.key === tab)!.label
 
   return (
     <>
@@ -158,7 +175,7 @@ export default function AdminSubmissions() {
           {TABS.map(t => (
             <button
               key={t.key}
-              onClick={() => setTab(t.key)}
+              onClick={() => { setTab(t.key); setConfirm(false) }}
               className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${tab === t.key ? 'bg-white text-navy shadow-sm' : 'text-gray-500 hover:text-navy'}`}
             >
               {t.label}
@@ -180,6 +197,28 @@ export default function AdminSubmissions() {
             </>
           )}
         </div>
+
+        {rows.length > 0 && (
+          <div className="mt-4 flex items-center justify-end gap-3">
+            {confirm && (
+              <span className="text-sm text-red-600">
+                Delete all {rows.length} {currentLabel}? This cannot be undone.
+              </span>
+            )}
+            <button
+              onClick={handleDeleteAll}
+              disabled={deleting}
+              onBlur={() => setConfirm(false)}
+              className={`text-sm px-4 py-2 rounded-lg border transition-colors disabled:opacity-50 ${
+                confirm
+                  ? 'bg-red-600 text-white border-red-600 hover:bg-red-700'
+                  : 'border-red-300 text-red-500 hover:bg-red-50'
+              }`}
+            >
+              {deleting ? 'Deleting…' : confirm ? 'Confirm Delete All' : 'Delete All'}
+            </button>
+          </div>
+        )}
       </AdminLayout>
     </>
   )
