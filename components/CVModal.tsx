@@ -19,6 +19,7 @@ export default function CVModal({ open, onClose }: CVModalProps) {
   const [submitted, setSubmitted] = useState(false)
   const [loading, setLoading]     = useState(false)
   const [fileError, setFileError] = useState('')
+  const [error, setError]         = useState('')
   const [fileName, setFileName]   = useState('')
 
   useEffect(() => {
@@ -60,11 +61,14 @@ export default function CVModal({ open, onClose }: CVModalProps) {
     const formData = new FormData(form)
 
     try {
-      await fetch('/api/cv-submit', {
-        method: 'POST',
-        body: formData,
-      })
-    } catch (_) {}
+      const res = await fetch('/api/cv-submit', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok) { setError(data.error ?? 'Something went wrong. Please try again.'); setLoading(false); return }
+    } catch (_) {
+      setError('Network error. Please try again.')
+      setLoading(false)
+      return
+    }
 
     setLoading(false)
     setSubmitted(true)
@@ -148,6 +152,7 @@ export default function CVModal({ open, onClose }: CVModalProps) {
               </label>
               {fileError && <p className="text-red-500 text-xs mt-1">{fileError}</p>}
             </div>
+            {error && <p className="text-red-500 text-xs text-center">{error}</p>}
             <button type="submit" disabled={loading || !!fileError} className="btn-primary w-full justify-center">
               {loading ? 'Submitting...' : 'Submit Profile'}
             </button>
