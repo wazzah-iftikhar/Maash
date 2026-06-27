@@ -85,7 +85,10 @@ function CvDownloadButton({ cvPath }: { cvPath: string }) {
   const handleDownload = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/cv-signed-url?path=${encodeURIComponent(cvPath)}`)
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch(`/api/cv-signed-url?path=${encodeURIComponent(cvPath)}`, {
+        headers: { Authorization: `Bearer ${session?.access_token ?? ''}` },
+      })
       const { url } = await res.json()
       if (url) window.open(url, '_blank', 'noopener,noreferrer')
     } finally {

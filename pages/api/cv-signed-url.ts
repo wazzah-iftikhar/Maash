@@ -5,13 +5,14 @@ import { createClient } from '@supabase/supabase-js'
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') return res.status(405).end()
 
-  // Verify the caller is an authenticated admin via their session cookie
+  // Verify the caller is an authenticated admin via Bearer token
+  const token = req.headers.authorization?.replace('Bearer ', '')
+  if (!token) return res.status(401).json({ error: 'Unauthorized' })
   const supabaseUser = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { cookie: req.headers.cookie ?? '' } } }
   )
-  const { data: { user } } = await supabaseUser.auth.getUser()
+  const { data: { user } } = await supabaseUser.auth.getUser(token)
   if (!user) return res.status(401).json({ error: 'Unauthorized' })
 
   const cvPath = typeof req.query.path === 'string' ? req.query.path : null
