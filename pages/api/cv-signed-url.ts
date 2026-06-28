@@ -1,13 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { supabaseAdmin } from '@/lib/supabaseAdmin'
 import { createClient } from '@supabase/supabase-js'
+import { getCvSignedUrl } from '@/services/cvService'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') return res.status(405).end()
 
-  // Verify the caller is an authenticated admin via Bearer token
   const token = req.headers.authorization?.replace('Bearer ', '')
   if (!token) return res.status(401).json({ error: 'Unauthorized' })
+
   const supabaseUser = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -18,16 +18,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const cvPath = typeof req.query.path === 'string' ? req.query.path : null
   if (!cvPath) return res.status(400).json({ error: 'Missing path' })
 
-  // Prevent path traversal
-  if (cvPath.includes('..') || cvPath.startsWith('/')) {
-    return res.status(400).json({ error: 'Invalid path' })
+  try {
+    const url = await getCvSignedUrl(cvPath)
+    res.status(200).json({ url })
+  } catch (e: any) {
+    res.status(e.status ?? 500).json({ error: e.message })
   }
-
-  const { data, error } = await supabaseAdmin.storage
-    .from('cvs')
-    .createSignedUrl(cvPath, 60) // 60 seconds — enough to open the download
-
-  if (error || !data?.signedUrl) return res.status(500).json({ error: 'Could not generate link' })
-
-  res.status(200).json({ url: data.signedUrl })
 }

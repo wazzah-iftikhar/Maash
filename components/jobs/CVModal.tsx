@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { HiX } from 'react-icons/hi'
-import FormSuccess from './FormSuccess'
+import FormSuccess from '@/components/shared/FormSuccess'
 
 interface CVModalProps {
   open: boolean

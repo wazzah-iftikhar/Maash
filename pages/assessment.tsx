@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { useState } from 'react'
-import FormSuccess from '@/components/FormSuccess'
+import FormSuccess from '@/components/shared/FormSuccess'
 
 
 const MODULES = [

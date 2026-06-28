@@ -1,12 +1,13 @@
 import nodemailer from 'nodemailer'
+import { env } from './env'
 
 const transporter = nodemailer.createTransport({
-  host:   process.env.EMAIL_HOST || 'smtp.gmail.com',
-  port:   Number(process.env.EMAIL_PORT) || 587,
+  host:   env.EMAIL_HOST,
+  port:   env.EMAIL_PORT,
   secure: false,
   auth: {
-    user: process.env.EMAIL_USER || '',
-    pass: process.env.EMAIL_PASS || '',
+    user: env.EMAIL_USER ?? '',
+    pass: env.EMAIL_PASS ?? '',
   },
 })
 
@@ -20,13 +21,13 @@ function escapeHtml(str: string): string {
 }
 
 export async function sendMail(subject: string, html: string) {
-  if (!process.env.EMAIL_USER) {
-    console.log('[MAIL]', subject)
+  if (!env.EMAIL_USER) {
+    console.log('[mailer] No EMAIL_USER set — skipping send:', subject)
     return
   }
   await transporter.sendMail({
-    from:    `"Ma'aash Platform" <${process.env.EMAIL_USER}>`,
-    to:      process.env.EMAIL_TO || process.env.EMAIL_USER,
+    from:    `"Ma'aash Platform" <${env.EMAIL_USER}>`,
+    to:      env.EMAIL_TO ?? env.EMAIL_USER,
     subject: escapeHtml(subject),
     html,
   })

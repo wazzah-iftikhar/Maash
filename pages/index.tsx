@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
-import FormSuccess from '@/components/FormSuccess'
+import FormSuccess from '@/components/shared/FormSuccess'
 
 // ── Hero network SVG ──────────────────────────────────────
 function HeroNetwork() {

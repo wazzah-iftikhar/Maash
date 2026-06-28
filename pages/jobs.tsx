@@ -1,9 +1,10 @@
 import Head from 'next/head'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import useSWR from 'swr'
 import { Job } from '@/data/jobs'
-import JobCard from '@/components/JobCard'
-import JobModal from '@/components/JobModal'
-import CVModal from '@/components/CVModal'
+import JobCard from '@/components/jobs/JobCard'
+import JobModal from '@/components/jobs/JobModal'
+import CVModal from '@/components/jobs/CVModal'
 
 const ALL = ''
 
@@ -29,8 +30,7 @@ function SkeletonCard() {
 }
 
 export default function JobsPage() {
-  const [jobs,    setJobs]    = useState<Job[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: jobs = [], isLoading: loading } = useSWR<Job[]>('/api/jobs', (url: string) => fetch(url).then(r => r.json()))
 
   const [country, setCountry] = useState(ALL)
   const [city,    setCity]    = useState(ALL)
@@ -41,13 +41,6 @@ export default function JobsPage() {
 
   const [selected, setSelected] = useState<Job | null>(null)
   const [cvOpen,   setCvOpen]   = useState(false)
-
-  useEffect(() => {
-    fetch('/api/jobs')
-      .then(r => r.json())
-      .then(data => { setJobs(data); setLoading(false) })
-      .catch(() => setLoading(false))
-  }, [])
 
   const countries  = [...new Set(jobs.map(j => j.country))].sort()
   const cities     = [...new Set(jobs.map(j => j.city))].sort()

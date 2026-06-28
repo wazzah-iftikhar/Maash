@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
-import AdminLayout from '@/components/AdminLayout'
+import AdminLayout from '@/components/admin/AdminLayout'
 import { useAdminAuth } from '@/lib/adminAuth'
 import { supabase } from '@/lib/supabase'
 

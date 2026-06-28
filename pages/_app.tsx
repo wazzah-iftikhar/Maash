@@ -1,6 +1,6 @@
 import type { AppProps } from 'next/app'
 import { useRouter } from 'next/router'
-import Layout from '@/components/Layout'
+import Layout from '@/components/shared/Layout'
 import { AppProgressBar as ProgressBar } from 'next-nprogress-bar'
 import '@/styles/globals.css'
 
